@@ -15,5 +15,11 @@
   "bugs": {
     "url": "https://github.com/ayush0816/Atlan/issues"
   },
-  "homepage": "https://github.com/ayush0816/Atlan#readme"
+  "homepage": "https://github.com/ayush0816/Atlan#readme",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.18.2",
+    "mongoose": "^7.5.0",
+    "nodemon": "^3.0.1"
+  }
 }
