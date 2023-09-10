@@ -7,11 +7,14 @@ const signup = async (req, res) => {
     const checkUserByUserName = await UserModel.findOne({
       email: req.body.email,
     });
+
     if (checkUserByUserName) {
+      console.log("yes");
       throw new Error("User with this username already exists");
       return false;
     }
-    const user = await UserModel.create(req.body);
+
+    const user = await UserModel.create(req.body); 
     const token = jwt.sign({ userId: user._id.toString() }, "SECRET");
     return res.status(200).json({ token: token, status: "success" });
   } catch (error) {

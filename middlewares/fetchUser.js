@@ -7,7 +7,7 @@ const fetchUser = (req, res, next) => {
   }
   const data = jwt.verify(token, "SECRET");
 
-  req.id = data.userId;
+  req.userId = data.userId;
   next();
 };
 
