@@ -7,11 +7,11 @@ const queSchema = new mongoose.Schema({
   },
   type: {
     type: String,
-    enum: ["MCQ", "Text", "Numeric", "Date"], 
+    enum: ["MCQ", "Text", "Numeric", "Date"],
     required: true,
   },
   options: [{ type: String }], // For MCQ questions
-  form: {
+  formId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Form",
   },
