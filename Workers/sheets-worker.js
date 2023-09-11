@@ -10,7 +10,7 @@ async function consumeSheets() {
     const channel = await connection.createChannel();
     const queueName = "google-sheets-queue"; // Change this to your queue name
 
-    // await channel.assertQueue(queueName, { durable: true });
+    await channel.assertQueue(queueName, { durable: true });
     console.log(`Worker connected to the queue: ${queueName}`);
 
     channel.consume(queueName, async (message) => {

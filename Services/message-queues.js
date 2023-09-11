@@ -17,7 +17,7 @@ const sendMessageToQueue = async (queueName, message, options = {}) => {
       },
     };
 
-    // await channel.assertQueue(queueName, { durable: true });
+    await channel.assertQueue(queueName, { durable: true });
 
     // Send the message to the queue
     await channel.sendToQueue(

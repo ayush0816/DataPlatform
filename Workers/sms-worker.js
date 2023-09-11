@@ -21,7 +21,7 @@ const consumeSMSQueue = async () => {
 
     const queueName = "smsQueue"; // Replace with the correct name of your RabbitMQ queue
 
-    // await channel.assertQueue(queueName, { durable: true });
+    await channel.assertQueue(queueName, { durable: true });
     console.log(`Worker is waiting for messages in ${queueName}.`);
 
     channel.consume(queueName, async (msg) => {

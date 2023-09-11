@@ -8,6 +8,8 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
+
+// API routes for Login and Signup
 app.use("/api/auth", require("./routes/auth"));
 app.use("/api/form", require("./routes/forms"));
 app.use("/api/que", require("./routes/ques"));
