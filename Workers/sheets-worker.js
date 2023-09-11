@@ -1,14 +1,15 @@
 const amqp = require("amqplib");
 
-const googleSheets = require("../Services/google-sheets-api"); // Import your Google Sheets module
+const googleSheets = require("../Services/google-sheets-api"); 
 const dotenv = require("dotenv");
 dotenv.config({ path: __dirname + "/../config/config.env" });
 
 async function consumeSheets() {
   try {
+    // Establishing the connection
     const connection = await amqp.connect(process.env.rabbitMQUrl);
     const channel = await connection.createChannel();
-    const queueName = "google-sheets-queue"; // Change this to your queue name
+    const queueName = "google-sheets-queue"; 
 
     await channel.assertQueue(queueName, { durable: true });
     console.log(`Worker connected to the queue: ${queueName}`);
@@ -34,6 +35,7 @@ async function consumeSheets() {
       } catch (error) {
         console.error("Error sending SMS:", error.message);
 
+        // For retrying in case of any error
         const retryCount = msg.properties.headers["x-retry-count"];
         const maxRetries = msg.properties.headers["x-max-retries"];
         const dlqName = msg.properties.headers["x-dlq"];

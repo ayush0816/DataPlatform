@@ -1,7 +1,7 @@
 const amqp = require("amqplib");
 
 // RabbitMQ server URL
-const rabbitMQUrl = "amqp://localhost"; // Replace with your RabbitMQ server URL
+const rabbitMQUrl = "amqp://localhost"; 
 
 const sendMessageToQueue = async (queueName, message, options = {}) => {
   try {

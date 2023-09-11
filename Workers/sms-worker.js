@@ -1,4 +1,3 @@
-// smsWorker.js
 
 const amqp = require("amqplib");
 const twilio = require("twilio");
@@ -12,14 +11,15 @@ const twilioPhoneNumber = process.env.twilioPhoneNumber;
 const client = twilio(accountSid, authToken);
 
 // RabbitMQ server URL
-const rabbitMQUrl = "amqp://localhost"; // Replace with your RabbitMQ server URL
+const rabbitMQUrl = process.env.rabbitMQUrl;
 
 const consumeSMSQueue = async () => {
   try {
+    // Establishing the connection
     const connection = await amqp.connect(rabbitMQUrl);
     const channel = await connection.createChannel();
 
-    const queueName = "smsQueue"; // Replace with the correct name of your RabbitMQ queue
+    const queueName = "smsQueue"; 
 
     await channel.assertQueue(queueName, { durable: true });
     console.log(`Worker is waiting for messages in ${queueName}.`);
@@ -39,7 +39,7 @@ const consumeSMSQueue = async () => {
           console.log("SMS sent:", message);
         } catch (error) {
           console.error("Error sending SMS:", error.message);
-
+          // For retrying in case of any error
           const retryCount = msg.properties.headers["x-retry-count"];
           const maxRetries = msg.properties.headers["x-max-retries"];
           const dlqName = msg.properties.headers["x-dlq"];
@@ -64,8 +64,6 @@ const consumeSMSQueue = async () => {
     throw new Error("Failed to consume messages from the queue");
   }
 };
-
-// consumeSMSQueue();
 
 module.exports = {
   consumeSMSQueue,

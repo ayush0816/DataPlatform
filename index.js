@@ -11,8 +11,14 @@ app.use(cors());
 
 // API routes for Login and Signup
 app.use("/api/auth", require("./routes/auth"));
+
+//API routes for adding a new form
 app.use("/api/form", require("./routes/forms"));
+
+//API Routes for adding questions
 app.use("/api/que", require("./routes/ques"));
+
+//API routes for adding a new response
 app.use("/api/res", require("./routes/response"));
 
 app.listen(port, () => {

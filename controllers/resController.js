@@ -12,15 +12,19 @@ const { consumeSheets } = require("../Workers/sheets-worker");
 
 const addres = async (req, res) => {
   try {
+    // Get the formId from parameters
     const { formId } = req.params;
-    const { userId } = req; // Assuming userId is available in the request due to middleware
+    // Get the userId from middleware 
+    const { userId } = req; 
     const { answers } = req.body;
 
+    // Check for user
     const user = await UserModel.findById(userId);
     if (!user) {
       throw new Error("User not found");
     }
 
+    // Add the respnse to db
     const response = new Response({ formId, userId });
     const savedResponse = await response.save();
     const rowData = [];
@@ -28,47 +32,46 @@ const addres = async (req, res) => {
     for (const answerData of answers) {
       const { queId, text } = answerData;
 
+      //Find the ques from the form
       const question = await Question.findOne({ _id: queId });
 
       if (!question) {
         return res.status(404).json({ error: "Question not found" });
       }
 
+      //Provide the answer and link it to response and the ques using their IDs
       const answer = new Answer({
-        resId: response._id, // Link the answer to the response using its ID
+        resId: response._id, 
         queId,
         text,
       });
 
       await answer.save();
+
+      //Push the mapped ques -> ans values to a 2-D arr
       rowData.push([question.text, answer.text]);
     }
 
-    // Specify your spreadsheetId and range where you want to add the data
+    // Specify spreadsheetId and range where data needs to be added
     const spreadsheetId = process.env.SPREADSHEET_ID;
-    const range = "Sheet1"; // Set your desired sheet and range
-
-    // Use the Google Sheets module to add the row to the Google Sheet
+    const range = "Sheet1"; 
 
     const message = {
       spreadsheetId,
       range,
       rowData,
     };
+
+    //Sending the message to message Queue
     await sendMessageToQueue("google-sheets-queue", message ,{
       maxRetries: 3, 
-      dlq: 'smsDLQ', 
+      dlq: 'sheetsDLQ', 
     });
 
-    
+    // Consuming the messages from the queues
     consumeSheets();
 
-    // const sheetsResponse = await googleSheets.addRowToSheet(
-    //   spreadsheetId,
-    //   range,
-    //   rowData
-    // );
-
+    // Getting the customer phone from the body
     const { custPhone } = req.body;
 
     // Call the sendSMS function from the smsService module
@@ -76,6 +79,8 @@ const addres = async (req, res) => {
       maxRetries: 3, // Maximum retry count for sending the message
       dlq: "smsDLQ", 
     });
+
+    //Consuming the messages from the queue
     consumeSMSQueue();
 
     res.json({ savedResponse, smsResult });

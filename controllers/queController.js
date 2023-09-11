@@ -2,6 +2,8 @@ const Question = require("../Models/ques");
 
 const addque = async (req, res) => {
   try {
+
+    // Adding a new Ques to a form 
     const { formId } = req.params;
     const { text, type, options } = req.body;
 

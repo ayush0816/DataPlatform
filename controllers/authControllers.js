@@ -3,7 +3,8 @@ const jwt = require("jsonwebtoken");
 
 const signup = async (req, res) => {
   try {
-    console.log(req.body);
+    
+    //Checking If the user is already available
     const checkUserByUserName = await UserModel.findOne({
       email: req.body.email,
     });
@@ -14,6 +15,7 @@ const signup = async (req, res) => {
       return false;
     }
 
+    // Creating a new user in db
     const user = await UserModel.create(req.body); 
     const token = jwt.sign({ userId: user._id.toString() }, "SECRET");
     return res.status(200).json({ token: token, status: "success" });
@@ -24,11 +26,16 @@ const signup = async (req, res) => {
 
 const login = async (req, res) => {
   try {
+    // Finding an existing user
     const user = await UserModel.findOne({ email: req.body.email });
     if (!user) throw new Error("User does not exists");
+
+    // Check if the password mathc or not
     if (user.password != req.body.password) {
       throw new Error("Invalid Password !!!");
     }
+
+    // Send a token for the user
     const token = jwt.sign({ userId: user._id.toString() }, "SECRET");
     return res.status(200).json({ token: token, status: "success" });
   } catch (error) {

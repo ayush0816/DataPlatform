@@ -2,6 +2,8 @@ const Form = require("../Models/forms");
 
 const addform = async (req, res) => {
   try {
+
+    //Adding a new form in the db
     const { title, description } = req.body;
     const form = new Form({ title, description });
     const savedForm = await form.save();

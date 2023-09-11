@@ -1,4 +1,3 @@
-// smsService.js
 
 const { sendMessageToQueue } = require("./message-queues");
 
