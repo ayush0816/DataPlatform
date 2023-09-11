@@ -3,9 +3,10 @@
 const amqp = require("amqplib");
 const twilio = require("twilio");
 const dotenv = require("dotenv");
-dotenv.config({ path: __dirname + "../config/config.env" });
+dotenv.config({ path: __dirname + "/../config/config.env" });
 
 // Twilio configuration
+console.log(process.env.accountSid);
 const accountSid = process.env.accountSid;
 const authToken = process.env.authToken;
 const twilioPhoneNumber = process.env.twilioPhoneNumber;
@@ -20,8 +21,8 @@ const consumeSMSQueue = async () => {
     const channel = await connection.createChannel();
 
     const queueName = "smsQueue"; // Replace with the correct name of your RabbitMQ queue
-
-    await channel.assertQueue(queueName, { durable: true });
+ 
+    // await channel.assertQueue(queueName, { durable: true });
     console.log(`Worker is waiting for messages in ${queueName}.`);
 
     channel.consume(queueName, async (msg) => {

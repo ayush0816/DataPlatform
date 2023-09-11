@@ -8,7 +8,7 @@ const sendMessageToQueue = async (queueName, message) =>{
     const connection = await amqp.connect(rabbitMQUrl);
     const channel = await connection.createChannel();
     
-    await channel.assertQueue(queueName, { durable: true });
+    // await channel.assertQueue(queueName, { durable: true });
     
     // Send the message to the queue
     await channel.sendToQueue(queueName, Buffer.from(JSON.stringify(message)), {

@@ -7,6 +7,8 @@ const smsService = require("../Services/twilio-sms-api");
 const { consumeSMSQueue } = require("../Workers/sms-worker");
 const dotenv = require("dotenv");
 dotenv.config({ path: __dirname + "/../config/config.env" });
+const { sendMessageToQueue } = require("../Services/message-queues");
+const { consumeSheets } = require("../Workers/sheets-worker");
 
 const addres = async (req, res) => {
   try {
@@ -42,18 +44,25 @@ const addres = async (req, res) => {
       rowData.push([question.text, answer.text]);
     }
 
-   
     // Specify your spreadsheetId and range where you want to add the data
     const spreadsheetId = process.env.SPREADSHEET_ID;
     const range = "Sheet1"; // Set your desired sheet and range
 
-
     // Use the Google Sheets module to add the row to the Google Sheet
-    const sheetsResponse = await googleSheets.addRowToSheet(
+
+    const message = {
       spreadsheetId,
       range,
-      rowData
-    );
+      rowData,
+    };
+    await sendMessageToQueue("google-sheets-queue", message);
+    consumeSheets();
+
+    // const sheetsResponse = await googleSheets.addRowToSheet(
+    //   spreadsheetId,
+    //   range,
+    //   rowData
+    // );
 
     const { custPhone } = req.body;
 
@@ -61,7 +70,7 @@ const addres = async (req, res) => {
     const smsResult = await smsService.sendSMS(custPhone, user.name, rowData);
     consumeSMSQueue();
 
-    res.json({ savedResponse, sheetsResponse, smsResult });
+    res.json({ savedResponse });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
