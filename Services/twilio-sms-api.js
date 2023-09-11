@@ -13,7 +13,10 @@ const sendSMS = async (customerPhone, customerName, response) => {
     }
 
     // Send the message to the message queue
-    await sendMessageToQueue("smsQueue", { customerPhone, message });
+    await sendMessageToQueue("smsQueue", { customerPhone, message } ,  {
+      maxRetries: 3, 
+      dlq: 'smsDLQ', 
+    });
 
     console.log("SMS added to the message queue");
     return "SMS added to the message queue";

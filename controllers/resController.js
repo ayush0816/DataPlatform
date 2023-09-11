@@ -55,7 +55,12 @@ const addres = async (req, res) => {
       range,
       rowData,
     };
-    await sendMessageToQueue("google-sheets-queue", message);
+    await sendMessageToQueue("google-sheets-queue", message ,{
+      maxRetries: 3, 
+      dlq: 'smsDLQ', 
+    });
+
+    
     consumeSheets();
 
     // const sheetsResponse = await googleSheets.addRowToSheet(
@@ -67,10 +72,13 @@ const addres = async (req, res) => {
     const { custPhone } = req.body;
 
     // Call the sendSMS function from the smsService module
-    const smsResult = await smsService.sendSMS(custPhone, user.name, rowData);
+    const smsResult = await smsService.sendSMS(custPhone, user.name, rowData, {
+      maxRetries: 3, // Maximum retry count for sending the message
+      dlq: "smsDLQ", 
+    });
     consumeSMSQueue();
 
-    res.json({ savedResponse });
+    res.json({ savedResponse, smsResult });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

@@ -1,6 +1,6 @@
 const { google } = require("googleapis");
 const dotenv = require("dotenv");
-dotenv.config({ path : __dirname + "/../config/config.env" });
+dotenv.config({ path: __dirname + "/../config/config.env" });
 
 const sheets = google.sheets("v4");
 const auth = new google.auth.JWT(

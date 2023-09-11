@@ -32,10 +32,22 @@ async function consumeSheets() {
         // Acknowledge the message to remove it from the queue
         channel.ack(message);
       } catch (error) {
-        console.error("Error processing message:", error);
+        console.error("Error sending SMS:", error.message);
 
-        // Handle errors, you might want to retry or log the error
-        // Note: In production, you should implement better error handling and retries
+        const retryCount = msg.properties.headers["x-retry-count"];
+        const maxRetries = msg.properties.headers["x-max-retries"];
+        const dlqName = msg.properties.headers["x-dlq"];
+
+        if (retryCount < maxRetries) {
+          // Increase the retry count
+          msg.properties.headers["x-retry-count"] += 1;
+
+          // Re-enqueue the message with the same delay
+          channel.sendToQueue(queueName, msg.content, msg.properties);
+        } else if (dlqName) {
+          // Max retries reached, move to the DLQ
+          channel.sendToQueue(dlqName, msg.content, msg.properties);
+        }
       }
     });
   } catch (error) {
